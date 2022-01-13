@@ -27,6 +27,14 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 class FileUpload(Resource):
     def post(self):
 
+        # 사진(파일)과 텍스트 데이터를 함께 받을 수 있다.
+
+        # from-data의 text 형식에서 데이터를 가져오는 경우
+        # content 라는 키에 데이터를 받는다. (body)
+        print(request.form['content'])
+
+        # form-data의 file 형식에서 데이터를 가져오는 경우
+        # photo 라는 키에 데이터를 받는다. (body)
         if 'photo' not in request.files:
             
             return {'error':'파일 업로드 하세요'}, 400
@@ -39,7 +47,9 @@ class FileUpload(Resource):
 
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) #로컬(파일시스템) 경로 저장
+
+            
 
         
         return {'result' : '잘 저장되었습니다.'}       
