@@ -1,5 +1,4 @@
 from flask_restful import Resource
-from flask.cli import run_command
 from werkzeug.utils import secure_filename
 from flask import request
 import os
@@ -9,7 +8,7 @@ import os
 ALLOWED_EXTENSIONS = set( ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 # 확장자 검사 함수
-def allowd_file(filename) :
+def allowed_file(filename) :
     return '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
 
@@ -26,9 +25,9 @@ class FileUploadResource(Resource) :
             return {'error':'파일 이름을 확인해주세요.'}, 400
 
         # 파일 저장
-        if file and allowd_file(file.filename) :
+        if file and allowed_file(file.filename) :
             filename = secure_filename(file.filename)
-            file.save(os.path.join('files'), filename)
+            file.save('files', filename)
 
 
-        return {'result':'잘 저장되었습니다.'}
+        return {'result':'저장에 성공했습니다.'}

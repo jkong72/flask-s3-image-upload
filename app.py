@@ -1,7 +1,6 @@
 from flask import Flask, request
 from flask_restful import Api
 from werkzeug.utils import secure_filename
-from flask.cli import run_command
 import os
 
 #configuration
