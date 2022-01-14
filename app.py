@@ -49,10 +49,29 @@ class FileUpload(Resource):
             filename = secure_filename(file.filename)
             # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) #로컬(파일시스템) 경로 저장
 
+            # S3와 연결 
+            s3 = boto3.client('s3',
+                        aws_access_key_id = app.config['ACCESS_KEY'],
+                        aws_secret_access_key = app.config['SECRET_ACCESS'])
             
+            try:
+                s3.upload_fileobj(file,
+                                app.config['S3_BUCKET'],
+                                file.filename, # 현재 예제에서는 파일명을 그대로 사용하지만, 시간이나 닉네임등을 이용해 유니크하게 만들어줄 필요가 있음.
+                                ExtraArgs = {'ACL' : 'public-read',
+                                            'ContentType' : file.content_type}) 
 
+            except Exception as e:
+                return {'message':'에러가 발생했습니다.', 'error' : f'에러 코드 : {str(e)}' }
         
-        return {'result' : '잘 저장되었습니다.'}       
+
+        # 업로드한 파일의 객체 url의 형식은 https:// (버킷).amazonaws.com/ (파일명) 형식이다.
+        return {'result' : '잘 저장되었습니다.',
+                'img_url' : app.config['S3_LOCATION'] + file.filename,
+                'content' : request.form['content']}
+
+                # 실제 이미지는 S3 (스토리지)에, url과 주석(파일에 대한 설명 등)은 RDS(DB)에 
+
 
 
 api.add_resource(FileUpload,'/data')
